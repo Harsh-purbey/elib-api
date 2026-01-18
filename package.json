@@ -15,6 +15,7 @@
   "author": "Harsh purbey <harshpurbey8182@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "http-errors": "^2.0.1",

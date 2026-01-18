@@ -1,5 +1,6 @@
 import createHttpError from "http-errors";
 import userModel from "./user-model";
+import bcrypt from "bcrypt";
 
 const createUser = async (request, response, next) => {
   const { name, email, password } = request.body;
@@ -14,6 +15,8 @@ const createUser = async (request, response, next) => {
     const error = createHttpError(400, "User already exists with this email.");
     return next(error);
   }
+  // password -> hash
+  const hashedPassword = await bcrypt.hash(password, 10);
   // Process
   // Response
   response.json({ message: "User registered" });
