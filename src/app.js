@@ -4,6 +4,8 @@ import userRouter from "./user/user-router.js";
 
 const app = express();
 
+app.use(express.json());
+
 app.get("/", (req, res, next) => {
   res.json({
     message: "Welocme to elib apis",
