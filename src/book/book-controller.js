@@ -31,7 +31,7 @@ const createBook = async (request, response, next) => {
 		})
 
 		const newBook = await bookModel.create({
-			title, genre, author: '696cd6234e492c5026108ed7', coverImage: uploadResult.secure_url, file: bookFileUploadResult.secure_url
+			title, genre, author: request.userId, coverImage: uploadResult.secure_url, file: bookFileUploadResult.secure_url
 		})
 
 		// delete temp files
@@ -42,7 +42,7 @@ const createBook = async (request, response, next) => {
 			return response.status(201).json({ id: newBook._id });
 
 		} catch (error) {
-         return next(createHttpError(500,"Error while deleting temporary store files."))
+			return next(createHttpError(500, "Error while deleting temporary store files."))
 		}
 
 
