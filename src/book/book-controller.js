@@ -1,5 +1,5 @@
 const createBook = async (request, response, next) => {
-  return response.json({});
+	return response.json({});
 };
 
 export { createBook };
