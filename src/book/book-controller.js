@@ -3,6 +3,7 @@ import cloudinary from "../config/cloudinary.js";
 import createHttpError from "http-errors";
 import bookModel from "./book-model.js";
 import fs from "fs";
+import { response } from "express";
 
 const createBook = async (request, response, next) => {
 
@@ -155,4 +156,46 @@ const getSingleBook = async (request, response, next) => {
 	}
 }
 
-export { createBook, updateBook, listBooks, getSingleBook };
+const deleteBook = async (request, response, next) => {
+	const bookId = request.params.bookId;
+	try {
+		const book = await bookModel.findOne({ _id: bookId });
+
+		if (!book) {
+			return next(createHttpError(404, "Book not found."))
+		}
+
+		if (book.author.toString() !== request.userId) {
+			return next(createHttpError(403, "You can not delete other's book."))
+		}
+
+		try {
+			const coverFileSplits = book.coverImage.split('/');
+			const coverImagePublicId = coverFileSplits.at(-2) + '/' + (coverFileSplits.at(-1).split('.')[0])
+			await cloudinary.uploader.destroy(coverImagePublicId)
+		} catch (error) {
+			return next(createHttpError(500, "Error while deleting the cover image."))
+		}
+
+		try {
+			const bookFileSplits = book.file.split('/');
+			const filePublicId = bookFileSplits.at(-2) + '/' + bookFileSplits.at(-1)
+			await cloudinary.uploader.destroy(filePublicId, { resource_type: "raw" })
+		} catch (error) {
+			return next(createHttpError(500, "Error while deleting the pdf file."))
+		}
+
+		try {
+			await bookModel.deleteOne({ _id: bookId })
+			return response.sendStatus(204);
+		} catch (error) {
+			return next(createHttpError(500, "Error while deleting the book."))
+
+		}
+
+	} catch (error) {
+		return next(createHttpError(500, "Error while getting the book."))
+	}
+}
+
+export { createBook, updateBook, listBooks, getSingleBook, deleteBook };

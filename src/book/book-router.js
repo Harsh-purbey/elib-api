@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import multer from "multer";
-import { createBook, getSingleBook, listBooks, updateBook } from "./book-controller.js";
+import { createBook, deleteBook, getSingleBook, listBooks, updateBook } from "./book-controller.js";
 import authenticate from "../middlewares/authenticate.js";
 
 const bookRouter = express.Router();
@@ -24,5 +24,6 @@ bookRouter.patch("/:bookId", authenticate, upload.fields([
 
 bookRouter.get("/", listBooks)
 bookRouter.get("/:bookId", getSingleBook)
+bookRouter.delete("/:bookId", authenticate, deleteBook)
 
 export default bookRouter;
