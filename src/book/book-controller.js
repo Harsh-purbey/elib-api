@@ -3,7 +3,6 @@ import cloudinary from "../config/cloudinary.js";
 import createHttpError from "http-errors";
 import bookModel from "./book-model.js";
 import fs from "fs";
-import { response } from "express";
 
 const createBook = async (request, response, next) => {
 
