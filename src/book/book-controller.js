@@ -6,7 +6,7 @@ import fs from "fs";
 
 const createBook = async (request, response, next) => {
 
-	const { title, genre } = request.body
+	const { title, genre, description } = request.body
 
 	try {
 		const coverImageMimeType = request.files.coverImage[0].mimetype.split('/').at(-1);
@@ -31,8 +31,7 @@ const createBook = async (request, response, next) => {
 		})
 
 		const newBook = await bookModel.create({
-
-			title, genre, author: request.userId, coverImage: uploadResult.secure_url, file: bookFileUploadResult.secure_url
+			title, description, genre, author: request.userId, coverImage: uploadResult.secure_url, file: bookFileUploadResult.secure_url
 		})
 
 		// delete temp files
@@ -55,7 +54,7 @@ const createBook = async (request, response, next) => {
 };
 
 const updateBook = async (request, response, next) => {
-	const { title, genre } = request.body;
+	const { title, genre, description } = request.body;
 	const bookId = request.params.bookId;
 
 	const book = await bookModel.findOne({ _id: bookId });
@@ -115,6 +114,7 @@ const updateBook = async (request, response, next) => {
 		const updatedBook = await bookModel.findByIdAndUpdate({ _id: bookId }, {
 			title: title ? title : book.title,
 			genre: genre ? genre : book.genre,
+			description: description ? description : book.description,
 			coverImage: completeCoverImage ? completeCoverImage : book.coverImage,
 			file: completeFileName ? completeFileName : book.file
 		}, { new: true });
@@ -130,7 +130,7 @@ const updateBook = async (request, response, next) => {
 const listBooks = async (request, response, next) => {
 
 	try {
-		const booksList = await bookModel.find();
+		const booksList = await bookModel.find().populate("author", "name");
 		return response.status(200).json(booksList);
 	} catch (error) {
 		return next(createHttpError(500, "Error while getting a book."))
@@ -141,7 +141,7 @@ const getSingleBook = async (request, response, next) => {
 	const bookId = request.params.bookId;
 
 	try {
-		const book = await bookModel.findOne({ _id: bookId });
+		const book = await bookModel.findOne({ _id: bookId }).populate("author", "name");
 
 		if (!book) {
 			return next(createHttpError(404, "Book not found."))
